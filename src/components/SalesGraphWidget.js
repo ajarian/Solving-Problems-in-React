@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-
 import moment from 'moment';
 import vis from 'vis-timeline/dist/vis-timeline-graph2d.esm';
 import 'vis-timeline/dist/vis-timeline-graph2d.css';
+
+import '../styles/SalesGraphWidget.scss';
 
 export default class SalesGraphWidget extends Component {
     constructor(props) {
@@ -14,38 +15,88 @@ export default class SalesGraphWidget extends Component {
             timeline: null
         }
 
-        this.createDataSet = this.createDataSet.bind(this);
+        this.createGraph = this.createGraph.bind(this);
+        this.findMaxRange = this.findMaxRange.bind(this);
     }
 
     componentDidMount() {
-        this.createDataSet();
+        this.createGraph();
     }
 
-    createDataSet() {
-        let dataPoints = 10,
+    componentWillUnmount() {
+        this.state.graph.destroy();
+    }
+
+    createGraph() {
+        let numberOfPoints = 10,
             graphPoints = [];
 
-        for (let i=0; i < dataPoints; i++) {
-            let point = {x: moment(), y: i};
+        // Creating set of points to display on graph
+        // Each point has a random y value and an x value that is 
+        // i hours from current time
+        for (let i=1; i <= numberOfPoints; i++) {
+            let time = moment().startOf('hour').add(i, 'hours'),
+                saleNumber = (Math.random() * 100) + i ,
+                point = {x: time, y: saleNumber};
+            
             graphPoints.push(point);
         }
 
-        let dataSet = new vis.DataSet(graphPoints),
+        // Setting necessary values to instantiate graph
+        let container = document.getElementById('graph'),
+            dataSet = new vis.DataSet(graphPoints),
             options = {
+                width: '800px',
+                height: '350px',
+                drawPoints: {
+                    size: 8,
+                    style: 'circle'
+                },
+                format: {
+                    minorLabels: {
+                        hour: 'ha'
+                    },
+                    majorLabels: {
+                        hour: 'ha'
+                    }
+                },
+                start: graphPoints[0].x,
+                end: graphPoints[graphPoints.length - 1].x,
+                showMajorLabels: false
             };
 
-        let container = document.getElementById('graph');
         let graph2d = new vis.Graph2d(container, dataSet, options);
-        console.log(graph2d);
 
         this.setState({
             dataSet: dataSet,
             options: options,
             graph: graph2d
         });
+
+        this.findMaxRange(dataSet);
+    }
+
+    findMaxRange(dataSet) {
+        let max = 0,
+            maxTime = null;
+
+        dataSet.forEach((point) => {
+            if (point.y > max) {
+                max = point.y;
+                maxTime = point.x;
+            }
+        });
+
+        this.setState({ maxTime });
     }
 
     render() {
+        let maxRange = '';
+
+        if (this.state.maxTime) {
+            maxRange = `${this.state.maxTime.format('h:mma')} - ${this.state.maxTime.add(1, 'hour').format('h:mma')}`
+        }
+
         return (
             <div>
                 <div>Most Popular Times</div>
@@ -55,10 +106,11 @@ export default class SalesGraphWidget extends Component {
                 <div id="graph">
 
                 </div>
+                { this.state.dataSet &&
                 <div>
-                    This product is used most often between x - y.
+                    This product is used most often between { maxRange }.
                 </div>
-                <button onClick={() => this.state.graph.redraw()}>Press</button>
+                }
             </div>
         );
     }
