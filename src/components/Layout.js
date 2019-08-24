@@ -43,7 +43,7 @@ export default class Layout extends Component {
                     <ParkingLotMover></ParkingLotMover>
                 }
 
-                <button onClick={this.onClick}>
+                <button style={{marginTop: '20px'}} onClick={this.onClick}>
                     Show {currentChallenge === SALES_GRAPH ? 'Parking Challenge' : 'Graph Challenge' }
                 </button>
             </div>

@@ -98,16 +98,14 @@ export default class SalesGraphWidget extends Component {
         }
 
         return (
-            <div>
-                <div>Most Popular Times</div>
-                <div>
+            <div className="sales-graph">
+                <div className="title">Most Popular Times</div>
+                <div className="description">
                     Gain insight on which time of the day your product is most popular.
                 </div>
-                <div id="graph">
-
-                </div>
+                <div id="graph"/>
                 { this.state.dataSet &&
-                <div>
+                <div className="tooltip-section">
                     This product is used most often between { maxRange }.
                 </div>
                 }

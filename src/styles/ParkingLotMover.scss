@@ -1,0 +1,31 @@
+.parking-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .parking-form {
+        margin-top: 20px;
+
+        .initial-label {
+            margin-right: 10px;
+        }
+
+        .array-input {
+            margin-left: 5px;
+        }
+
+        .submit-button {
+            margin-top: 10px;
+        }
+    }
+
+    .statement-section {
+        margin-top: 20px;
+       
+        .statement-box {
+            background-color: lightgray;
+            width: 250px;
+            height: 300px;
+        }
+    }
+}

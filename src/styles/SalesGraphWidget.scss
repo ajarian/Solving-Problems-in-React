@@ -1,6 +1,27 @@
+.sales-graph {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    border: 1px gray solid;
+    width: 800px;
+    align-content: center;
+    margin-left: 25px;
 
-// .vis-time-axis {
-//     .vis-minor {
-//         width: 58px;
-//     }
-// }
+    .title {
+        text-align: left;
+        background-color: lightgray;
+        height: 35px;
+    }
+
+    .description {
+        text-align: left;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .tooltip-section {
+        margin-top: 15px;
+        background-color: lightgoldenrodyellow;
+        border: 1px solid gray;
+    }
+}
