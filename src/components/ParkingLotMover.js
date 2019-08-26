@@ -10,12 +10,36 @@ export default class ParkingLotMover extends Component {
             movementStatements: []
         };
 
-        this.compareArrays = this.compareArrays.bind(this);
+        this.compareArrayOrder = this.compareArrayOrder.bind(this);
+        this.compareArrayContents = this.compareArrayContents.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.shiftCars = this.shiftCars.bind(this);
     }
 
-    compareArrays(array1, array2) {
+    compareArrayContents(array1, array2) {
+        let arrayContentsEqual = true,
+            dictionary = {};
+
+        // Iterate through array inserting each unique value into
+        // a dictionary
+        array1.forEach((value) => {
+            if (dictionary[value] !== value) {
+                dictionary[value] = value;
+            }
+        });
+
+        // Iterate through second array, making sure this array
+        // has the same numbers
+        array2.forEach((value) => {
+            if (dictionary[value] !== value) {
+                arrayContentsEqual = false;
+            }
+        });
+
+        return arrayContentsEqual;
+    }
+
+    compareArrayOrder(array1, array2) {
         let arraysEqual = true;
 
         array1.forEach((value, index) => {   
@@ -62,7 +86,7 @@ export default class ParkingLotMover extends Component {
         });
 
         // Determine if first pass was sufficient, if not perform shift again
-        let successfulMove = this.compareArrays(initial, target);
+        let successfulMove = this.compareArrayOrder(initial, target);
 
         if (!successfulMove) {
             this.shiftCars(initial, target);
@@ -72,27 +96,41 @@ export default class ParkingLotMover extends Component {
     onSubmit(event) {
         // prevents page reload
         event.preventDefault();
-        // clear old states on new request
-        this.setState({ movementStatements: [] });
+        let errors = [];
 
         // If user has supplied values for each array, process turning strings to numbers
         if (this.refs.initialArray.value && this.refs.initialArray.value) {
             let initialArray = this.refs.initialArray.value.split(',').map((string) => +string),
                 targetArray = this.refs.targetArray.value.split(',').map((string) => +string),
-                arraysEqual = this.compareArrays(initialArray, targetArray);
+                arrayContentsEqual = this.compareArrayContents(initialArray, targetArray);
 
             if (initialArray.length === targetArray.length) {
-                // check to see if initial and target are ordered the same
-                if (arraysEqual === false) {
-                    this.shiftCars(initialArray, targetArray);
+                // First check that arrays both have the same values
+                if (arrayContentsEqual) {
+                    // Check to see if initial and target are already ordered the same
+                    let arrayOrderEqual = this.compareArrayOrder(initialArray, targetArray);
+
+                    if (arrayOrderEqual === false) {
+                        // clear old states on new request
+                        this.setState({ movementStatements: [] });
+                        setTimeout(()=> {
+                            this.shiftCars(initialArray, targetArray)
+                        }, 0);
+                    } else {
+                        errors.push('Lots are already the same');
+                    }
                 } else {
-                    this.setState({ movementStatements: 'Lots are already the same' });
+                    errors.push('Lots don\'t have the same cars');
                 }
             } else {
-                this.setState({movementStatements: 'Arrays are not of the same length' });
+               errors.push('Arrays are not of the same length');
             }
         } else {
-            this.setState({movementStatements: 'No arrays provided'});
+            errors.push('No arrays provided');
+        }
+
+        if (errors.length > 0) {
+            this.setState({ movementStatements: errors });
         }
     }
 
